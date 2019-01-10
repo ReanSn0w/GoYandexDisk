@@ -13,6 +13,9 @@ type Link struct {
 
 //GetOperationTokenВернет токен операции для проверки статуса
 func (l Link) GetOperationToken() string {
+	if len(l.Href) < 49 {
+		return ""
+	}
 	return l.Href[48:]
 }
 
