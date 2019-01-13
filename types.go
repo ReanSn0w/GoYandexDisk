@@ -36,6 +36,8 @@ type Resource struct {
 	Size             int               `json:"size"`
 }
 
+type PublicResource Resource
+
 //ResourceList Список ресурсов, содержащихся в папке. Содержит объекты Resource и свойства списка.
 type ResourceList struct {
 	Sort       string     `json:"sort"`
