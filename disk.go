@@ -28,7 +28,6 @@ func (yd *YandexDisk) DiskStatus() (Disk, error) {
 		"",
 		"GET",
 		"",
-		nil,
 	)
 	if err != nil {
 		return Disk{}, err
@@ -53,7 +52,6 @@ func (yd YandexDisk) Get(path string, limit int, offset int) (Resource, error) {
 			"limit":  strconv.Itoa(limit),
 			"offset": strconv.Itoa(offset),
 		}),
-		nil,
 	)
 	if err != nil {
 		return Resource{}, err
@@ -78,7 +76,6 @@ func (yd YandexDisk) FlatList(limit int, offset int, media_type string) (FileRes
 			"offset":     strconv.Itoa(offset),
 			"media_type": media_type,
 		}),
-		nil,
 	)
 	if err != nil {
 		return FileResourceList{}, err
@@ -102,7 +99,6 @@ func (yd YandexDisk) LastUploaded(limit int, media_type string) (LastUploadedRes
 			"limit":      strconv.Itoa(limit),
 			"media_type": media_type,
 		}),
-		nil,
 	)
 	if err != nil {
 		return LastUploadedResourceList{}, err
@@ -117,8 +113,30 @@ func (yd YandexDisk) LastUploaded(limit int, media_type string) (LastUploadedRes
 	return result, err
 }
 
-////UploadFile
-////func (yd YandexDisk)UploadFile() {}
+//GetUploadFileURL Получение ссылки для загрузки файла на диск
+//Файл необходимо отправить методом PUT по ссылке,
+//его размер не должен превышать 10ГБ
+func (yd YandexDisk) GetUploadFileURL(path string, overwrite bool) (Link, error) {
+	body, code, err := yd.createRequest(
+		"resources/upload",
+		"GET",
+		createQuery(map[string]string{
+			"path":      path,
+			"overwrite": strconv.FormatBool(overwrite),
+		}),
+	)
+	if err != nil {
+		return Link{}, err
+	}
+
+	if err = parseError(code); err != nil {
+		return Link{}, err
+	}
+
+	var result Link
+	err = json.NewDecoder(body).Decode(&result)
+	return result, err
+}
 
 //UploadFileFromNet Загрузка файла на диск по ссылке из интернета
 func (yd YandexDisk) UploadFileFromNet(url string, path string, disable_redirects bool) (Link, error) {
@@ -130,7 +148,6 @@ func (yd YandexDisk) UploadFileFromNet(url string, path string, disable_redirect
 			"path":              path,
 			"disable_redirects": strconv.FormatBool(disable_redirects),
 		}),
-		nil,
 	)
 	if err != nil {
 		return Link{}, err
@@ -153,7 +170,6 @@ func (yd YandexDisk) DownloadFile(path string) (Link, error) {
 		createQuery(map[string]string{
 			"path": path,
 		}),
-		nil,
 	)
 	if err != nil {
 		return Link{}, err
@@ -180,7 +196,6 @@ func (yd YandexDisk) CopyResource(from string, path string, owerwrite bool, forc
 			"owerwrite":   strconv.FormatBool(owerwrite),
 			"force_async": strconv.FormatBool(force_async),
 		}),
-		nil,
 	)
 	if err != nil {
 		return Link{}, err
@@ -207,7 +222,6 @@ func (yd YandexDisk) ReplaceResource(from string, path string, owerwrite bool, f
 			"owerwrite":   strconv.FormatBool(owerwrite),
 			"force_async": strconv.FormatBool(force_async),
 		}),
-		nil,
 	)
 	if err != nil {
 		return Link{}, err
@@ -233,7 +247,6 @@ func (yd YandexDisk) DeleteResource(path string, permanently bool, force_async b
 			"permanently": strconv.FormatBool(permanently),
 			"force_async": strconv.FormatBool(force_async),
 		}),
-		nil,
 	)
 	if err != nil {
 		return Link{}, err
@@ -256,7 +269,6 @@ func (yd YandexDisk) CreateFolder(path string) (Link, error) {
 		createQuery(map[string]string{
 			"path": path,
 		}),
-		nil,
 	)
 	if err != nil {
 		return Link{}, err
@@ -279,7 +291,6 @@ func (yd YandexDisk) PublishResource(path string) (Link, error) {
 		createQuery(map[string]string{
 			"path": path,
 		}),
-		nil,
 	)
 	if err != nil {
 		return Link{}, err
@@ -303,7 +314,7 @@ func (yd YandexDisk) UnpublishResource(public_key string) (Link, error) {
 		createQuery(map[string]string{
 			"public_key": public_key,
 		}),
-		nil)
+	)
 	if err != nil {
 		return Link{}, err
 	}
@@ -331,7 +342,6 @@ func (yd YandexDisk) PublicResourceMeta(publik_key string, limit int, offset int
 			"path":       path,
 			"sort":       sort,
 		}),
-		nil,
 	)
 	if err != nil {
 		return PublicResource{}, err
@@ -357,7 +367,7 @@ func (yd YandexDisk) DownloadPublicResource(publik_key string, path string) (Lin
 			"public_key": publik_key,
 			"path":       path,
 		}),
-		nil)
+	)
 	if err != nil {
 		return Link{}, err
 	}
@@ -385,7 +395,6 @@ func (yd YandexDisk) SavePublicResource(publik_key string, path string, name str
 			"name":       name,
 			"save_path":  save_path,
 		}),
-		nil,
 	)
 	if err != nil {
 		return Link{}, err
@@ -415,7 +424,6 @@ func (yd YandexDisk) PublishResourcesList(public_key string, limit int, offset i
 			"path":       path,
 			"sort":       sort,
 		}),
-		nil,
 	)
 	if err != nil {
 		return PublicResource{}, err
@@ -440,7 +448,6 @@ func (yd YandexDisk) CleanTrash(path string) (Link, error) {
 		createQuery(map[string]string{
 			"path": path,
 		}),
-		nil,
 	)
 	if err != nil {
 		return Link{}, err
@@ -469,7 +476,6 @@ func (yd YandexDisk) RestoreResource(path string, name string, owerwrite bool, f
 			"owerwrite":   strconv.FormatBool(owerwrite),
 			"force_asunc": strconv.FormatBool(force_asunc),
 		}),
-		nil,
 	)
 	if err != nil {
 		return Link{}, err
@@ -492,7 +498,6 @@ func (yd YandexDisk) Status(id string) (RequestStatus, error) {
 		"operations/"+id,
 		"GET",
 		createQuery(map[string]string{}),
-		nil,
 	)
 	if err != nil {
 		return RequestStatus{}, err
@@ -521,12 +526,12 @@ func (yd YandexDisk) Status(id string) (RequestStatus, error) {
 	return result, err
 }
 
-func (ya YandexDisk) createRequest(link, method string, form string, body io.Reader) (io.ReadCloser, int, error) {
+func (ya YandexDisk) createRequest(link, method string, form string) (io.ReadCloser, int, error) {
 	//Формирование запроса
 	client := http.Client{}
-	req, err := http.NewRequest(method, baseURL+link+"?"+form, body)
+	req, err := http.NewRequest(method, baseURL+link+"?"+form, nil)
 	if form == "" {
-		req, err = http.NewRequest(method, baseURL+link, body)
+		req, err = http.NewRequest(method, baseURL+link, nil)
 	}
 	if err != nil {
 		return nil, 404, err
@@ -567,10 +572,16 @@ func parseError(code int) error {
 		return errors.New("Ресурс не может быть представлен в запрошенном виде")
 	case 409:
 		return errors.New("Указанного пути не существует")
+	case 412:
+		return errors.New("При дозагрузке файла был передан неверный диапазон в заголовке Content-Range")
+	case 413:
+		return errors.New("Размер файла превышает 10 ГБ")
 	case 423:
 		return errors.New("Ресурс заблокирован. Возможно над ним выполняется другая операция")
 	case 429:
 		return errors.New("Слишком много запросов")
+	case 500:
+		return errors.New("Внутренняя ошибка сервиса")
 	case 503:
 		return errors.New("Ресурс временно не доступен")
 	case 507:
