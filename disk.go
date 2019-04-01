@@ -1,13 +1,14 @@
-package GoYandexDisk
+package goyandexdisk
 
 import (
 	"encoding/json"
 	"fmt"
-	"github.com/pkg/errors"
 	"io"
 	"net/http"
 	"net/url"
 	"strconv"
+
+	"github.com/pkg/errors"
 )
 
 const baseURL = "https://cloud-api.yandex.net/v1/disk/"
@@ -67,14 +68,14 @@ func (yd YandexDisk) Get(path string, limit int, offset int) (Resource, error) {
 }
 
 //FlatList Получение плоского списка файлов
-func (yd YandexDisk) FlatList(limit int, offset int, media_type string) (FileResourceList, error) {
+func (yd YandexDisk) FlatList(limit int, offset int, mediaType string) (FileResourceList, error) {
 	body, code, err := yd.createRequest(
 		"resources/files",
 		"GET",
 		createQuery(map[string]string{
 			"limit":      strconv.Itoa(limit),
 			"offset":     strconv.Itoa(offset),
-			"media_type": media_type,
+			"media_type": mediaType,
 		}),
 	)
 	if err != nil {
@@ -91,13 +92,13 @@ func (yd YandexDisk) FlatList(limit int, offset int, media_type string) (FileRes
 }
 
 //LastUploaded получение списка последних загруженных файлов
-func (yd YandexDisk) LastUploaded(limit int, media_type string) (LastUploadedResourceList, error) {
+func (yd YandexDisk) LastUploaded(limit int, mediaType string) (LastUploadedResourceList, error) {
 	body, code, err := yd.createRequest(
 		"resources/files",
 		"GET",
 		createQuery(map[string]string{
 			"limit":      strconv.Itoa(limit),
-			"media_type": media_type,
+			"media_type": mediaType,
 		}),
 	)
 	if err != nil {
@@ -139,14 +140,14 @@ func (yd YandexDisk) GetUploadFileURL(path string, overwrite bool) (Link, error)
 }
 
 //UploadFileFromNet Загрузка файла на диск по ссылке из интернета
-func (yd YandexDisk) UploadFileFromNet(url string, path string, disable_redirects bool) (Link, error) {
+func (yd YandexDisk) UploadFileFromNet(url string, path string, disableRedirects bool) (Link, error) {
 	body, code, err := yd.createRequest(
 		"resources/upload",
 		"POST",
 		createQuery(map[string]string{
 			"url":               url,
 			"path":              path,
-			"disable_redirects": strconv.FormatBool(disable_redirects),
+			"disable_redirects": strconv.FormatBool(disableRedirects),
 		}),
 	)
 	if err != nil {
@@ -186,7 +187,7 @@ func (yd YandexDisk) DownloadFile(path string) (Link, error) {
 
 //CopyResource копирование ресурса
 //Обязательные параметры from, path
-func (yd YandexDisk) CopyResource(from string, path string, owerwrite bool, force_async bool) (Link, error) {
+func (yd YandexDisk) CopyResource(from string, path string, owerwrite bool, forceAsync bool) (Link, error) {
 	body, code, err := yd.createRequest(
 		"resources/move",
 		"PATH",
@@ -194,7 +195,7 @@ func (yd YandexDisk) CopyResource(from string, path string, owerwrite bool, forc
 			"from":        from,
 			"path":        path,
 			"owerwrite":   strconv.FormatBool(owerwrite),
-			"force_async": strconv.FormatBool(force_async),
+			"force_async": strconv.FormatBool(forceAsync),
 		}),
 	)
 	if err != nil {
@@ -212,7 +213,7 @@ func (yd YandexDisk) CopyResource(from string, path string, owerwrite bool, forc
 
 //ReplaceResource перемещение ресурса
 //Обязательные параметры from, path
-func (yd YandexDisk) ReplaceResource(from string, path string, owerwrite bool, force_async bool) (Link, error) {
+func (yd YandexDisk) ReplaceResource(from string, path string, owerwrite bool, forceAsync bool) (Link, error) {
 	body, code, err := yd.createRequest(
 		"resources/move",
 		"PATH",
@@ -220,7 +221,7 @@ func (yd YandexDisk) ReplaceResource(from string, path string, owerwrite bool, f
 			"from":        from,
 			"path":        path,
 			"owerwrite":   strconv.FormatBool(owerwrite),
-			"force_async": strconv.FormatBool(force_async),
+			"force_async": strconv.FormatBool(forceAsync),
 		}),
 	)
 	if err != nil {
@@ -238,14 +239,14 @@ func (yd YandexDisk) ReplaceResource(from string, path string, owerwrite bool, f
 
 //DeleteResource удаление ресурса
 //Обязательные параметры path
-func (yd YandexDisk) DeleteResource(path string, permanently bool, force_async bool) (Link, error) {
+func (yd YandexDisk) DeleteResource(path string, permanently bool, forceAsync bool) (Link, error) {
 	body, code, err := yd.createRequest(
 		"resource",
 		"DELETE",
 		createQuery(map[string]string{
 			"path":        path,
 			"permanently": strconv.FormatBool(permanently),
-			"force_async": strconv.FormatBool(force_async),
+			"force_async": strconv.FormatBool(forceAsync),
 		}),
 	)
 	if err != nil {
@@ -306,13 +307,13 @@ func (yd YandexDisk) PublishResource(path string) (Link, error) {
 	return result, err
 }
 
-////UnpublishResource отказаться от публикации ресурса
-func (yd YandexDisk) UnpublishResource(public_key string) (Link, error) {
+//UnpublishResource отказаться от публикации ресурса
+func (yd YandexDisk) UnpublishResource(publicKey string) (Link, error) {
 	body, code, err := yd.createRequest(
 		"resources/unpublish",
 		"PUT",
 		createQuery(map[string]string{
-			"public_key": public_key,
+			"public_key": publicKey,
 		}),
 	)
 	if err != nil {
@@ -330,13 +331,13 @@ func (yd YandexDisk) UnpublishResource(public_key string) (Link, error) {
 }
 
 //PublicResourceMeta получение мета информации о публичном ресурсе
-//Обязательные параметры publik_key
-func (yd YandexDisk) PublicResourceMeta(publik_key string, limit int, offset int, path string, sort string) (PublicResource, error) {
+//Обязательные параметры publicKey
+func (yd YandexDisk) PublicResourceMeta(publicKey string, limit int, offset int, path string, sort string) (PublicResource, error) {
 	body, code, err := yd.createRequest(
 		"public/resources",
 		"GET",
 		createQuery(map[string]string{
-			"public_key": publik_key,
+			"public_key": publicKey,
 			"limit":      strconv.Itoa(limit),
 			"offset":     strconv.Itoa(offset),
 			"path":       path,
@@ -358,13 +359,13 @@ func (yd YandexDisk) PublicResourceMeta(publik_key string, limit int, offset int
 }
 
 //DownloadPublicResource получение ссылки на зугрузку публичного ресурса
-//Обязательные аргументы public_key
-func (yd YandexDisk) DownloadPublicResource(publik_key string, path string) (Link, error) {
+//Обязательные аргументы publicKey
+func (yd YandexDisk) DownloadPublicResource(publicKey string, path string) (Link, error) {
 	body, code, err := yd.createRequest(
 		"public/resources/download",
 		"GET",
 		createQuery(map[string]string{
-			"public_key": publik_key,
+			"public_key": publicKey,
 			"path":       path,
 		}),
 	)
@@ -384,16 +385,16 @@ func (yd YandexDisk) DownloadPublicResource(publik_key string, path string) (Lin
 
 //SavePublicResource сохранение ресурса в папку загрузки
 //Обязательные параметры public_key
-func (yd YandexDisk) SavePublicResource(publik_key string, path string, name string, save_path string) (Link, error) {
+func (yd YandexDisk) SavePublicResource(publicKey string, path string, name string, savePath string) (Link, error) {
 	//Формирование запроса
 	body, code, err := yd.createRequest(
 		"public/resources/save-to-disk",
 		"POST",
 		createQuery(map[string]string{
-			"public_key": publik_key,
+			"public_key": publicKey,
 			"path":       path,
 			"name":       name,
-			"save_path":  save_path,
+			"save_path":  savePath,
 		}),
 	)
 	if err != nil {
@@ -410,15 +411,15 @@ func (yd YandexDisk) SavePublicResource(publik_key string, path string, name str
 	return result, err
 }
 
-//PublicResourcesMeta получение списка публичных файлов
-//Обязательные аргументы public_key
-func (yd YandexDisk) PublishResourcesList(public_key string, limit int, offset int, path string, sort string) (PublicResource, error) {
+//PublicResourcesList получение списка публичных файлов
+//Обязательные аргументы publicKey
+func (yd YandexDisk) PublicResourcesList(publicKey string, limit int, offset int, path string, sort string) (PublicResource, error) {
 	//Формирование запроса
 	body, code, err := yd.createRequest(
 		"resources/public",
 		"GET",
 		createQuery(map[string]string{
-			"public_key": public_key,
+			"public_key": publicKey,
 			"limit":      strconv.Itoa(limit),
 			"offset":     strconv.Itoa(offset),
 			"path":       path,
@@ -465,7 +466,7 @@ func (yd YandexDisk) CleanTrash(path string) (Link, error) {
 
 //RestoreResource восстановление ранее удаленного ресурса
 //Обязательные параметры path
-func (yd YandexDisk) RestoreResource(path string, name string, owerwrite bool, force_asunc bool) (Link, error) {
+func (yd YandexDisk) RestoreResource(path string, name string, overwrite bool, forceAsync bool) (Link, error) {
 	//Формирование запроса
 	body, code, err := yd.createRequest(
 		"trash/resources",
@@ -473,8 +474,8 @@ func (yd YandexDisk) RestoreResource(path string, name string, owerwrite bool, f
 		createQuery(map[string]string{
 			"path":        path,
 			"name":        name,
-			"owerwrite":   strconv.FormatBool(owerwrite),
-			"force_asunc": strconv.FormatBool(force_asunc),
+			"owerwrite":   strconv.FormatBool(overwrite),
+			"force_asunc": strconv.FormatBool(forceAsync),
 		}),
 	)
 	if err != nil {
@@ -494,7 +495,7 @@ func (yd YandexDisk) RestoreResource(path string, name string, owerwrite bool, f
 //Status возвращает текущий статус выполнения операции
 func (yd YandexDisk) Status(id string) (RequestStatus, error) {
 	//Отправка запроса
-	body, num, err := yd.createRequest(
+	body, code, err := yd.createRequest(
 		"operations/"+id,
 		"GET",
 		createQuery(map[string]string{}),
@@ -504,21 +505,8 @@ func (yd YandexDisk) Status(id string) (RequestStatus, error) {
 	}
 
 	//Обработка документированных ошибок
-	switch num {
-	case 400:
-		return RequestStatus{}, errors.New("Некорректные данные")
-	case 401:
-		return RequestStatus{}, errors.New("Не авторизован")
-	case 403:
-		return RequestStatus{}, errors.New("Не достаточно прав для изменения данных в общей папке.")
-	case 404:
-		return RequestStatus{}, errors.New("Не удалось найти запрошенный ресурс")
-	case 406:
-		return RequestStatus{}, errors.New("Ресурс не может быть представлен в запрошенном формате")
-	case 429:
-		return RequestStatus{}, errors.New("Слишком много запросов")
-	case 503:
-		return RequestStatus{}, errors.New("Сервис временно не доступен")
+	if err := parseError(code); err != nil {
+		return RequestStatus{}, err
 	}
 
 	var result RequestStatus
@@ -526,7 +514,7 @@ func (yd YandexDisk) Status(id string) (RequestStatus, error) {
 	return result, err
 }
 
-func (ya YandexDisk) createRequest(link, method string, form string) (io.ReadCloser, int, error) {
+func (yd YandexDisk) createRequest(link, method string, form string) (io.ReadCloser, int, error) {
 	//Формирование запроса
 	client := http.Client{}
 	req, err := http.NewRequest(method, baseURL+link+"?"+form, nil)
@@ -536,7 +524,7 @@ func (ya YandexDisk) createRequest(link, method string, form string) (io.ReadClo
 	if err != nil {
 		return nil, 404, err
 	}
-	req.Header.Add("Authorization", ya.accessToken)
+	req.Header.Add("Authorization", yd.accessToken)
 
 	//Его выполнение
 	resp, err := client.Do(req)
@@ -587,5 +575,5 @@ func parseError(code int) error {
 	case 507:
 		return errors.New("Недостаточно свободного места")
 	}
-	return nil
+	return errors.New("Не обработанное исключение")
 }

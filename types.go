@@ -1,4 +1,4 @@
-package GoYandexDisk
+package goyandexdisk
 
 import (
 	"time"
@@ -11,7 +11,7 @@ type Link struct {
 	Templated bool   `json:"templated"`
 }
 
-//GetOperationTokenВернет токен операции для проверки статуса
+//GetOperationToken Вернет токен операции для проверки статуса
 func (l Link) GetOperationToken() string {
 	if len(l.Href) < 49 {
 		return ""
@@ -21,7 +21,7 @@ func (l Link) GetOperationToken() string {
 
 //Resource Описание ресурса, мета-информация о файле или папке. Включается в ответ на запрос метаинформации.
 type Resource struct {
-	Publik_key       string            `json:"publik_key"`
+	PublicKey        string            `json:"publik_key"`
 	Embeded          ResourceList      `json:"_embedded"`
 	Name             string            `json:"name"`
 	Created          time.Time         `json:"created"`
@@ -32,21 +32,22 @@ type Resource struct {
 	Path             string            `json:"path"`
 	Md5              string            `json:"md_5"`
 	Type             string            `json:"type"`
-	Mime_type        string            `json:"mime_type"`
+	MimeType         string            `json:"mime_type"`
 	Size             int               `json:"size"`
 }
 
+// PublicResource Описание публичного ресурса
 type PublicResource Resource
 
 //ResourceList Список ресурсов, содержащихся в папке. Содержит объекты Resource и свойства списка.
 type ResourceList struct {
-	Sort       string     `json:"sort"`
-	Public_key string     `json:"public_key"`
-	Items      []Resource `json:"items"`
-	Path       string     `json:"path"`
-	Limit      int        `json:"limit"`
-	Offset     int        `json:"offset"`
-	Total      int        `json:"total"`
+	Sort      string     `json:"sort"`
+	PublicKey string     `json:"public_key"`
+	Items     []Resource `json:"items"`
+	Path      string     `json:"path"`
+	Limit     int        `json:"limit"`
+	Offset    int        `json:"offset"`
+	Total     int        `json:"total"`
 }
 
 //FileResourceList Плоский список всех файлов на Диске в алфавитном порядке.
@@ -75,12 +76,12 @@ type systemFolders struct {
 	Downloads    string `json:"downloads"`
 }
 
-//DiskДанные о свободном и занятом пространстве на Диске
+//Disk Данные о свободном и занятом пространстве на Диске
 type Disk struct {
-	Trash_size     int           `json:"trash_size"`
-	Total_space    int           `json:"total_space"`
-	User_space     int           `json:"user_space"`
-	System_folders systemFolders `json:"system_folders"`
+	TrashSize     int           `json:"trash_size"`
+	TotalSpace    int           `json:"total_space"`
+	UserSpace     int           `json:"user_space"`
+	SystemFolders systemFolders `json:"system_folders"`
 }
 
 //Operation Статус операции.
@@ -96,6 +97,7 @@ type RequestError struct {
 	Error       string `json:"error"`
 }
 
+//RequestStatus описивает состояние запроса
 type RequestStatus struct {
 	Status string `json:"status"`
 }
